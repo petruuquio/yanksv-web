@@ -1,99 +1,328 @@
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- ESSENCIAL -->
-  <title>YankSV</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 2rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    input, button { 
-      padding: 10px;
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-
-    .error {
-      color: red;
-    }
-
-    .card {
-      border: 1px solid #d8d8d8;
-      text-align: center;
-      padding: 20px;
-      border-radius: 20px;
-      margin-top: 20px;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 20px;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .options {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 400px) {
-      .options {
-        flex-direction: column;
-        gap: 5px;
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YankSV</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-    }
 
-    .button {
-      text-decoration: none;
-      color: black;
-      padding: 10px;
-      background-color: yellow;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 10px;
-      text-align: center;
-      display: inline-block;
-      user-select: none;
-    }
-  </style>
-</head>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0a0a0a 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        color: #e0e0e0;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow-x: hidden;
+      }
 
-<body>
-  <h1>YankSV - Baixe do Youtube</h1>
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 50%,
+            rgba(0, 255, 255, 0.05) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(255, 0, 255, 0.05) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
 
-  <% if (error) { %>
-    <p class="error"><%= error %></p>
-  <% } %>
+      .container {
+        max-width: 700px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
 
-  <form action="/download" method="POST">
-    <input type="text" name="url" placeholder="Cole a URL do vídeo aqui" required />
-    <button class="button" type="submit">Buscar vídeo</button>
-  </form>
+      h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #00f5ff 0%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        text-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+      }
 
-  <% if (videoInfo) { %>
-    <div class="card">
-      <h3><%= videoInfo.title %></h2>
-      <h4><%= videoInfo.channel %></h2>
-      <img src="<%= videoInfo.thumbnail %>" width="400" />
-      <div class="options">
-        <a href="/mp4?url=<%= encodeURIComponent(videoInfo.url) %>&title=<%= encodeURIComponent(videoInfo.title) %>" class="button">
-          Baixar Vídeo
-        </a>
-        <a href="/mp3?url=<%= encodeURIComponent(videoInfo.url) %>&title=<%= encodeURIComponent(videoInfo.title) %>" class="button">
-          Baixar Áudio
-        </a>
+      .subtitle {
+        text-align: center;
+        color: #888;
+        margin-bottom: 3rem;
+        font-size: 0.95rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .error {
+        background: rgba(255, 50, 50, 0.1);
+        border: 1px solid rgba(255, 50, 50, 0.3);
+        color: #ff5555;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      form {
+        background: rgba(30, 30, 50, 0.6);
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 2rem;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        background: rgba(20, 20, 35, 0.8);
+        border: 2px solid rgba(0, 245, 255, 0.2);
+        border-radius: 12px;
+        color: #e0e0e0;
+        outline: none;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+      }
+
+      input[type="text"]::placeholder {
+        color: #666;
+      }
+
+      input[type="text"]:focus {
+        border-color: #00f5ff;
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        background: rgba(20, 20, 35, 1);
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #00f5ff 0%, #00a8ff 100%);
+        border: none;
+        border-radius: 12px;
+        color: #0a0a0a;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+      }
+
+      button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5);
+        background: linear-gradient(135deg, #00fff5 0%, #00d4ff 100%);
+      }
+
+      button[type="submit"]:active {
+        transform: translateY(0);
+      }
+
+      .card {
+        background: rgba(30, 30, 50, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.5s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card h3 {
+        color: #fff;
+        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+      }
+
+      .card h4 {
+        color: #888;
+        margin-bottom: 1.5rem;
+        font-weight: 400;
+        font-size: 1rem;
+      }
+
+      img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .options {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .button {
+        text-decoration: none;
+        color: #0a0a0a;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 12px;
+        text-align: center;
+        display: inline-block;
+        user-select: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+
+      .button:hover::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      .button span {
+        position: relative;
+        z-index: 1;
+      }
+
+      .button:nth-child(1) {
+        background: linear-gradient(135deg, #ff00ff 0%, #ff0080 100%);
+        box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+      }
+
+      .button:nth-child(1):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(255, 0, 255, 0.5);
+      }
+
+      .button:nth-child(2) {
+        background: linear-gradient(135deg, #00f5ff 0%, #0080ff 100%);
+        box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+      }
+
+      .button:nth-child(2):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5);
+      }
+
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .options {
+          flex-direction: column;
+          gap: 0.8rem;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        form {
+          padding: 1.5rem;
+        }
+
+        .card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>YankSV</h1>
+      <p class="subtitle">Download do YouTube</p>
+
+      <% if (error) { %>
+      <div class="error"><%= error %></div>
+      <% } %>
+
+      <form action="/download" method="POST">
+        <input
+          type="text"
+          name="url"
+          placeholder="Cole a URL do vídeo aqui"
+          required
+        />
+        <button type="submit"><span>🔍 Buscar Vídeo</span></button>
+      </form>
+
+      <% if (videoInfo) { %>
+      <div class="card">
+        <h3><%= videoInfo.title %></h3>
+        <h4><%= videoInfo.channel %></h4>
+        <img src="<%= videoInfo.thumbnail %>" alt="Thumbnail do vídeo" />
+        <div class="options">
+          <a
+            href="/mp4?url=<%= encodeURIComponent(videoInfo.url) %>&title=<%= encodeURIComponent(videoInfo.title) %>"
+            class="button"
+          >
+            <span>🎬 Baixar Vídeo</span>
+          </a>
+          <a
+            href="/mp3?url=<%= encodeURIComponent(videoInfo.url) %>&title=<%= encodeURIComponent(videoInfo.title) %>"
+            class="button"
+          >
+            <span>🎵 Baixar Áudio</span>
+          </a>
+        </div>
       </div>
+      <% } %>
     </div>
-  <% } %>
-</body>
+  </body>
 </html>
